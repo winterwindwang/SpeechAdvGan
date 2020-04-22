@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b9b0a910-cc99-44d7-8fea-0f06328e1b90" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/down_5f814c23_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/go_5ff3f9a1_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/left_4c841771_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/no_9a69672b_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/off_3efef882_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/on_2c6d3924_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/right_9a7c1f83_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/stop_1fe4c891_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/up_f428ca69_nohash_0.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/yes_6f2f57c1_nohash_0.wav" beforeDir="false" />
-    </list>
+    <list default="true" id="b9b0a910-cc99-44d7-8fea-0f06328e1b90" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +39,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test_gan.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="239">
@@ -59,18 +47,6 @@
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="249">
-                <caret line="15" column="28" lean-forward="true" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="28" />
-              </first_editor>
-              <second_editor />
             </state>
           </provider>
         </entry>
@@ -166,9 +142,9 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="117" />
-    <option name="y" value="80" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="226" />
+    <option name="y" value="151" />
     <option name="width" value="1295" />
     <option name="height" value="1103" />
   </component>
@@ -282,7 +258,7 @@
       <workItem from="1587225648597" duration="3698000" />
       <workItem from="1587480413183" duration="11251000" />
       <workItem from="1587520891180" duration="582000" />
-      <workItem from="1587527097602" duration="7592000" />
+      <workItem from="1587527097602" duration="7856000" />
     </task>
     <servers />
   </component>
@@ -295,13 +271,13 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="37204000" />
+    <option name="totallyTimeSpent" value="37468000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="848" extended-state="6" />
+    <frame x="181" y="121" width="1036" height="882" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19839142" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3026585" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -522,16 +498,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test_gan.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="239">
-          <caret line="97" column="47" selection-start-line="97" selection-start-column="47" selection-end-line="97" selection-end-column="47" />
-          <folding>
-            <element signature="e#0#46#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -539,6 +505,16 @@
             <caret line="15" column="28" lean-forward="true" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="28" />
           </first_editor>
           <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_gan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="97" column="47" selection-start-line="97" selection-start-column="47" selection-end-line="97" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#46#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
