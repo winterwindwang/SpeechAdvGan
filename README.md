@@ -6,7 +6,7 @@ Examples for generated speech commands adversarial examples
 
 <style>
 	.wrong_cell {
-		background-color:  #8080ff
+		background-color:   #3366ff
 	}
     
     .right_cell {
@@ -86,9 +86,9 @@ Examples for generated speech commands adversarial examples
 		<tr>
 		 <td> <b> up </b> </td>
 	
-<td class="wrong_cell"><a href="demo_output/result/yes/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/yes/up/f428ca69_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/no/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/no/up/f428ca69_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
 <td class="right_cell"><a href="demo_output/data/up//653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
@@ -96,13 +96,13 @@ Examples for generated speech commands adversarial examples
 		
 <td class="wrong_cell"><a href="demo_output/result/left/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/right/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/right/up/f428ca69_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/on/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/on/up/f428ca69_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/off/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/off/up/f428ca69_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/stop/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/stop/up/f428ca69_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
 <td class="wrong_cell"><a href="demo_output/result/go/up/653a48f5_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
@@ -163,23 +163,23 @@ Examples for generated speech commands adversarial examples
 	
 <td class="wrong_cell"><a href="demo_output/result/yes/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/no/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/no/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/up/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/up/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/down/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/down/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/left/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/left/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="right_cell"><a href="demo_output/data/right//9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="right_cell"><a href="demo_output/data/right//3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/on/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/on/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/off/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/off/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/stop/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/stop/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
-<td class="wrong_cell"><a href="demo_output/result/go/right/9a7c1f83_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
+<td class="wrong_cell"><a href="demo_output/result/go/right/3cbd76a3_nohash_0.wav"><img src="https://cdn3.iconfinder.com/data/icons/pretty-office-part-9-shadow-style-2/256/Sound-on.png" width="16px" height="16px" /> </a>   </td>
 		
 </tr>
 <!-- source = on --> 
@@ -288,7 +288,7 @@ Examples for generated speech commands adversarial examples
 Attack preformance
 --------------------------
 
-![avatar](https://github.com/winterwindwang/SpeechAdvGan/blob/gh-pages/figures/wideresnet_heatmap?raw=true)
+![avatar](https://github.com/winterwindwang/SpeechAdvGan/gh-pages/figures/wideresnet_heatmap?raw=true)
 
 Running the attack
 ------------------
