@@ -288,7 +288,7 @@ Examples for generated speech commands adversarial examples
 Attack preformance
 --------------------------
 
-<img src = 'https://github.com/winterwindwang/SpeechAdvGan/gh-pages/figures/wideresnet_heatmap?raw=true'/>
+<img src = 'https://github.com/winterwindwang/SpeechAdvGan/blob/gh-pages/figures/wideresnet_heatmap.png?raw=true'/>
 
 Running the attack
 ------------------
