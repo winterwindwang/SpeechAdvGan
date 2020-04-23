@@ -6,11 +6,11 @@ Examples for generated speech commands adversarial examples
 
 <style>
 	.wrong_cell {
-		background-color:   #3366ff
+		background-color: #b3ccff
 	}
     
     .right_cell {
-    	background-color:  #b3ffb3
+    	background-color: #ffffff
     }
 
 
@@ -293,6 +293,7 @@ Attack preformance
 Running the attack
 ------------------
 To run:
+
 	python test_gan.py --data_dir original_speech.wav --target yes --checkpoint checkpoints
 
 
