@@ -2,13 +2,13 @@ import os
 import numpy as np
 from scipy.io import wavfile
 
-import librosa
+# import librosa
 import torch
-from transforms import *
+# from transforms import *
 
 from torch.utils.data import Dataset
 from torchvision import datasets
-__all__ = ['CLASSES','CLASSES_ALL', 'CLASSES2INDEX', 'SpeechCommandsDataset', 'BackgroundNoiseDataset', 'SpeechCommandsDataset_v2', 'BackgroundNoiseDataset_v2','SpeechCommandsDataset_classifier']
+__all__ = ['CLASSES','CLASSES_ALL', 'CLASSES2INDEX', 'SpeechCommandsDataset',  'SpeechCommandsDataset_v2','SpeechCommandsDataset_classifier']
 
 CLASSES = ['yes']  #.split(',') #,no,up,,down,left  right, on, off, stop, go
 CLASSES_ALL = 'yes,no,up,down,left,right,on,off,stop,go'.split(',') #
@@ -64,36 +64,6 @@ class SpeechCommandsDataset(Dataset):
             weight[idx] = weight_per_class[item[1]]
         return weight
 
-class BackgroundNoiseDataset(Dataset):
-    """Dataset for silence / background noise."""
-
-    def __init__(self, folder, transform=None, sample_rate=16384, sample_length=1):
-        audio_files = [d for d in os.listdir(folder) if os.path.isfile(os.path.join(folder, d)) and d.endswith('.wav')]
-        samples = []
-        for f in audio_files:
-            path = os.path.join(folder, f)
-            s, sr = librosa.load(path, sample_rate)
-            samples.append(s)
-
-        samples = np.hstack(samples)
-        c = int(sample_rate * sample_length)
-        r = len(samples) // c
-        self.samples = samples[:r*c].reshape(-1, c)
-        self.sample_rate = sample_rate
-        self.classes = CLASSES
-        self.transform = transform
-        self.path = folder
-
-    def __len__(self):
-        return len(self.samples)
-
-    def __getitem__(self, index):
-        data = {'samples': self.samples[index], 'sample_rate': self.sample_rate, 'target': 1, 'path': self.path}
-
-        if self.transform is not None:
-            data = self.transform(data)
-
-        return data
 
 def minimaxscaler(data):
     min = np.amin(data)
@@ -153,49 +123,15 @@ class SpeechCommandsDataset_v2(Dataset):
         # data = {'samples': samples, 'label': target, 'sample_rate':sample_rate}
         g_in_data = torch.FloatTensor(samples)
         d_in_data = torch.FloatTensor(din_sample)
-        return d_in_data, g_in_data, label
+        # return d_in_data, g_in_data, label
+        return g_in_data, label
 
-
-class BackgroundNoiseDataset_v2(Dataset):
-    """Dataset for silence / background noise."""
-
-    def __init__(self, folder, transform=None, sample_rate=16384, sample_length=1):
-        audio_files = [d for d in os.listdir(folder) if os.path.isfile(os.path.join(folder, d)) and d.endswith('.wav')]
-        samples = []
-        for f in audio_files:
-            path = os.path.join(folder, f)
-            s, sr = librosa.load(path, sample_rate)
-            samples.append(s)
-
-        samples = np.hstack(samples)
-        c = int(sample_rate * sample_length)
-        r = len(samples) // c
-        self.samples = samples[:r*c].reshape(-1, c)
-        self.sample_rate = sample_rate
-        self.classes = CLASSES
-        self.transform = transform
-        self.path = folder
-
-    def __len__(self):
-        return len(self.samples)
-
-    def __getitem__(self, index):
-        data = {'samples': self.samples[index], 'sample_rate': self.sample_rate, 'target': 1, 'path': self.path}
-
-        if self.transform is not None:
-            data = self.transform(data)
-
-        return data
 
 
 class SpeechCommandsDataset_classifier(Dataset):
     def __init__(self, folder,transform=None, classes=CLASSES, loader=default_loader):
        # all_classes = [d for d in os.listdir(folder) if os.path.isdir(os.path.join(folder, d)) and not d.startswith('_') ]
         all_classes = 'yes,no,up,down,left,right,on,off,stop,go'.split(',')   #CLASSES
-        # class_to_idx = {all_classes[i]: i for i in range(len(all_classes))}
-        # for c in all_classes:
-        #     if c not in class_to_idx:
-        #         class_to_idx[c] = 0
         data = []
         for c in all_classes:
             d = os.path.join(folder, c)

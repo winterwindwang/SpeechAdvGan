@@ -17,8 +17,9 @@ import models
 from models.discriminator import Discriminator
 from models.generator import Generator, Generator_pert, Generator_speech
 from datasets import *
-from transforms import *
-
+# from transforms import *
+import random
+import numpy as np
 
 def setup_seed(seed):
     torch.manual_seed(seed)
@@ -40,8 +41,8 @@ def wav_save(epoch, data, data_dir, label, target, name):
         # output = output.astype(np.int16)
         labels = idx2classes[label[i]]
         dir = os.path.join(data_dir, labels)
-        if os.path.exists(dir) is False:
-            os.mkdir(dir)
+        if not os.path.exists(dir):
+            os.makedirs(dir)
         filename = "{}_{}_to_{}_epoch_{}_{}.wav".format(name, idx2classes[label[i]], idx2classes[target], epoch, i)
         path = os.path.join(dir, filename)
         wavfile.write(path, 16384, output)
@@ -57,24 +58,24 @@ def train(epoch, target):
     epoch_loss_g = 0
     epoch_loss_d = 0
     n = 0
-    Tensor = torch.cuda.FloatTensor if use_gpu else torch.FloatTensor
+    Tensor = torch.cuda.FloatTensor if "cuda" in device.__str__() else torch.FloatTensor
     pbar = tqdm(train_loader, unit='audios', unit_scale=train_loader.batch_size)
     for inputs, label in pbar:
         inputs = torch.unsqueeze(inputs, 1)
-
-        if use_gpu:
-            inputs = inputs.to(device)
-            label = label.to(device)
+        inputs = inputs.to(device)
+        label = label.to(device)
 
         G.zero_grad()
         perturbation = torch.clamp(G(inputs), -0.3, 0.3)
         adv_audio = perturbation + inputs
         fakes = adv_audio.clamp(-1., 1.)
 
-        y_pred = f(fakes)
-        # lengths = [inputs.size(2) for _ in range(inputs.size(0))]
-        # val, mfcc_lengths = mfcc_layer(torch.squeeze(fakes), lengths)
-        # y_pred = f(torch.unsqueeze(val, dim=1))
+        if "wideresnet28_10" in args.model:
+            lengths = [inputs.size(2) for _ in range(inputs.size(0))]
+            val, mfcc_lengths = mfcc_layer(torch.squeeze(fakes), lengths)
+            y_pred = f(torch.unsqueeze(val, dim=1))
+        elif "sampleCNN" in args.model:
+            y_pred = f(fakes)
 
         if args.is_targeted:
             y_target = Variable(torch.ones_like(label).fill_(target).to(device))
@@ -89,8 +90,7 @@ def train(epoch, target):
         dg_fake,_ = D(fakes)
         g_loss_d = torch.mean((dg_fake - 1.0) ** 2)
         g_loss_l1 = torch.mean(torch.abs(torch.add(fakes, torch.neg(inputs))))
-        # g_loss_l1 = criterion_l1(inputs, fakes)
-        # g_loss_gan = criterion_gan(D(fakes), valid)
+
         loss_perturb = torch.mean(torch.norm(perturbation.view(perturbation.shape[0], -1), 2, dim=1))
 
         if epoch >= 3:
@@ -131,6 +131,7 @@ def train(epoch, target):
     writer.add_scalar('%s/epoch_loss_d' % phase, epoch_loss_ds, epoch)
     writer.add_scalar('%s/epoch_loss_g' % phase, epoch_loss_gs, epoch)
 
+
 def valid(epoch, target):
     global best_accuracy, best_loss, global_step
     f.eval()
@@ -141,16 +142,12 @@ def valid(epoch, target):
 
     n = 0
     epoch_loss_g = 0
-    Tensor = torch.cuda.FloatTensor if use_gpu else torch.FloatTensor
     pbar = tqdm(valid_loader, unit="audios", unit_scale=valid_loader.batch_size)
     for samples, labels in pbar:
         inputs = torch.unsqueeze(samples, 1)
 
-        inputs = Variable(inputs, requires_grad=True)
-        labels = Variable(labels, requires_grad=False)
-        if use_gpu:
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+        inputs = inputs.to(device)
+        labels = labels.to(device)
 
         # Valid Generator
 
@@ -158,10 +155,13 @@ def valid(epoch, target):
         adv_audio = perturbation + inputs
         fakes = adv_audio.clamp(-1., 1.)
 
-        y_pred = f(fakes)
-        # lengths = [inputs.size(2) for _ in range(inputs.size(0))]
-        # val, mfcc_lengths = mfcc_layer(torch.squeeze(fakes.detach()), lengths)
-        # y_pred = f(torch.unsqueeze(val, dim=1))
+        if "wideresnet28_10" in args.model:
+            lengths = [inputs.size(2) for _ in range(inputs.size(0))]
+            val, mfcc_lengths = mfcc_layer(torch.squeeze(fakes), lengths)
+            y_pred = f(torch.unsqueeze(val, dim=1))
+        elif "sampleCNN" in args.model:
+            y_pred = f(fakes)
+
         if args.is_targeted:
             y_target = Variable(torch.ones_like(labels).fill_(target).to(device))
             loss_adv = criterion_crossentropy(y_pred, y_target)
@@ -173,16 +173,12 @@ def valid(epoch, target):
         dg_fake, _ = D(fakes)
         g_loss_d = torch.mean((dg_fake - 1.0) ** 2)
         g_loss_l1 = torch.mean(torch.abs(torch.add(fakes, torch.neg(inputs))))
-        # g_loss_l1 = criterion_l1(inputs, fakes)
-        # g_loss_gan = criterion_gan(D(fakes), valid)
         loss_perturb = torch.mean(torch.norm(perturbation.view(perturbation.shape[0], -1), 2, dim=1))
         if epoch >= 3:
             g_loss = g_loss_d + loss_adv + 100 * g_loss_l1 + loss_perturb
         else:
             g_loss = g_loss_d + 100 * g_loss_l1 + loss_perturb
-        g_optimizer.zero_grad()
-        g_loss.backward()
-        g_optimizer.step()
+
         epoch_loss_g += g_loss.item()
 
         # statistics
@@ -212,16 +208,19 @@ def valid(epoch, target):
 
     if accuracy > best_accuracy:
         best_accuracy = accuracy
-        wav_save(epoch, fakes, 'samples/best_attack', labels, target, 'best_att')
-        torch.save(checkpoint, 'checkpoints/genres_classifiction/best-acc-generator-checkpoint-%s.pth' % full_name)
-        torch.save(G, 'runs/model/%d-%s-best-loss.pth' % (start_timestamp, full_name))
+        # save_dir = os.path.join(args.wav_save_dir, 'best_attack')
+        # if not os.path.exists(save_dir):
+        #     os.mkdir(save_dir)
+        # wav_save(epoch, fakes, save_dir, labels, target, 'best_att')
+        torch.save(checkpoint, f'{writer.logdir}/best-acc-generator-checkpoint-%s.pth' % full_name)
+        torch.save(G, f'{writer.logdir}/%d-%s-best-loss.pth' % (start_timestamp, full_name))
     if epoch_loss < best_loss:
         best_loss = epoch_loss
-        torch.save(checkpoint, 'checkpoints/genres_classifiction/best-loss-generator-checkpoint-%s.pth' % full_name)
-        torch.save(G, 'runs/model/%d-%s-best-acc.pth' % (start_timestamp, full_name))
+        torch.save(checkpoint, f'{writer.logdir}/best-loss-generator-checkpoint-%s.pth' % full_name)
+        torch.save(G, f'{writer.logdir}/%d-%s-best-acc.pth' % (start_timestamp, full_name))
 
-    torch.save(checkpoint, 'checkpoints/genres_classifiction/generator-checkpoint-epoch-%s.pth' % (epoch))
-    torch.save(checkpoint, 'checkpoints/genres_classifiction/last-generator-checkpoint.pth')
+    # torch.save(checkpoint, f'{writer.logdir}/generator-checkpoint-epoch-%s.pth' % (epoch))
+    torch.save(checkpoint, f'{writer.logdir}/last-generator-checkpoint.pth')
     del checkpoint  # reduce memory
 
     return epoch_loss
@@ -231,15 +230,16 @@ def test(epoch, target):
     pbar = tqdm(test_loader, unit="audios", unit_scale=test_loader.batch_size)
     for samples, labels in pbar:
         inputs = torch.unsqueeze(samples, 1)
-        if use_gpu:
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+
         perturbation = torch.clamp(G(inputs), -0.3, 0.3)
         adv_audio = perturbation + inputs
         fakes = adv_audio.clamp(-1., 1.)
-        wav_save(epoch, fakes, 'samples/gen', labels, target, 'fake')
-        wav_save(epoch, perturbation, 'samples/pert', labels, target, 'pert')
-        wav_save(epoch, inputs, 'samples/real', labels, target, 'real')
+
+        wav_save(epoch, fakes, f'{args.wav_save_dir}/gen', labels, target, 'fake')
+        wav_save(epoch, perturbation, f'{args.wav_save_dir}/pert', labels, target, 'pert')
+        wav_save(epoch, inputs, f'{args.wav_save_dir}/real', labels, target, 'real')
 
 
 
@@ -247,63 +247,42 @@ if __name__ == '__main__':
     setup_seed(1022)
     parser = argparse.ArgumentParser(description='Audio_advGAN')
     parser.add_argument('--epochs', type=int, default=60, help='')
-    parser.add_argument('--batch_size', type=int, default=64, help='')
+    parser.add_argument('--batch_size', type=int, default=16, help='')
     parser.add_argument('--g_lr', type=float, default=1e-5, help='')
     parser.add_argument('--d_lr', type=float, default=1e-5, help='')
-    parser.add_argument('--train_dataset', type=str, default='datasets/genres/train', help='datasets/speech_commands/train')
-    parser.add_argument('--valid_dataset', type=str, default='datasets/genres/valid', help='datasets/speech_commands/valid')
-    parser.add_argument('--test_dataset', type=str, default='datasets/genres/test', help='datasets/speech_commands/test')
+    parser.add_argument('--train_dataset', type=str, default='dataset/train', help='datasets/speech_commands/train')
+    parser.add_argument('--valid_dataset', type=str, default='dataset/valid', help='datasets/speech_commands/valid')
+    parser.add_argument('--test_dataset', type=str, default='dataset/test', help='datasets/speech_commands/test')
     parser.add_argument('--checkpoint', type=str, default='./checkpoints', help='')
-    parser.add_argument('--model', choices=models.available_models, default=models.available_models[0],
+    parser.add_argument('--wav_save_dir', type=str, default='saved_wav', help='')
+    parser.add_argument('--model', choices=models.available_models, default=models.available_models[1],
                         help='model of NN')
-    parser.add_argument("--dataload-workers-nums", type=int, default=6, help='number of workers for dataloader')
+    parser.add_argument("--dataload-workers-nums", type=int, default=0, help='number of workers for dataloader')
     parser.add_argument("--weight-decay", type=float, default=1e-2, help='weight decay')
     parser.add_argument("--pre_trained", type=bool, default=True, help='checkpoint file to resume')
     parser.add_argument("--max-epochs", type=int, default=50, help='max number of epochs')
     parser.add_argument("--optim", choices=['adam'], default='adam', help='choices of optimization algorithms')
     parser.add_argument("--is_targeted", type=bool, default=True, help='is target ')
-    parser.add_argument("--target", type=str, default='reggae', help='the target you wanted to attack')
+    parser.add_argument("--target", type=str, default='yes', help='the target you wanted to attack')
     args = parser.parse_args()
 
-    use_gpu = torch.cuda.is_available()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Use GPU', device)
-    if use_gpu:
-        torch.backends.cudnn.benchmarks = True
 
-    train_dataset = MusicGenre_adv(args.train_dataset,args.target)  # train_feature_transform
-    valid_dataset = MusicGenre_adv(args.valid_dataset,args.target)  # valid_feature_transform
-    test_dataset = MusicGenre_adv(args.test_dataset,args.target)  # valid_feature_transform
-
-    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=use_gpu,
-                              num_workers=args.dataload_workers_nums, drop_last=True)
-    valid_loader = DataLoader(valid_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=use_gpu,
-                              num_workers=args.dataload_workers_nums, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False, pin_memory=use_gpu,
-                             num_workers=args.dataload_workers_nums, drop_last=True)
-
-    # a name used to save checkpoints etc.
-    full_name = '%s_%s_%s_bs%d_lr%.1e_wd%.1e' % (
-        args.model, args.optim, args.lr_scheduler, args.batch_size, args.g_lr, args.weight_decay)
-
-    # speech recognition
-    # f = models.create_model(model_name=args.model, num_classes=10, in_channels=1)
-
-    # musi gener classification
-    f = models.create_model(model_name=args.model, num_classes=10, in_channels=1).to(device)
     G = Generator().to(device)
     D = Discriminator().to(device)
-    # mfcc_layer = MFCC(samplerate=16384, numcep=32, nfft=2048, nfilt=32).to(device)  # MFCC layer
-    if use_gpu:
-        # f = torch.nn.DataParallel(f).cuda()
-        f = f.cuda()
+    mfcc_layer = MFCC(samplerate=16384, numcep=32, nfft=2048, nfilt=32).to(device)  # MFCC layer
+    f = models.create_model(model_name=args.model, num_classes=10, in_channels=1).to(device)
+
 
     criterion_gan = nn.MSELoss()
     criterion_l1 = nn.L1Loss()
     criterion_l2 = nn.MSELoss()
     criterion_crossentropy = nn.CrossEntropyLoss()
 
-    if use_gpu:
+    if "cuda" in device.__str__():
+        torch.backends.cudnn.benchmarks = True
+        f = torch.nn.DataParallel(f).cuda()
         criterion_gan.to(device)
         criterion_l1.to(device)
         criterion_l2.to(device)
@@ -312,33 +291,55 @@ if __name__ == '__main__':
     g_optimizer = optim.Adam(G.parameters(), lr=args.g_lr, betas=(0.5, 0.999))
     d_optimizer = optim.Adam(D.parameters(), lr=args.d_lr, betas=(0.5, 0.999))
 
+    # speech recognition
+    if "wideresnet28_10" in args.model:
+        train_dataset = SpeechCommandsDataset_v2(args.train_dataset, args.target)
+        valid_dataset = SpeechCommandsDataset_v2(args.valid_dataset, args.target)
+        test_dataset = SpeechCommandsDataset_v2(args.test_dataset, args.target)
+        print("Loading a pretrained model ")
+        checkpoint = torch.load(os.path.join(args.checkpoint, 'wideResNet28_10.pth'))
+        f.load_state_dict(checkpoint['state_dict'])
+        del checkpoint  # reduce memory
+    elif "sampleCNN" in args.model:
+        train_dataset = MusicGenre_adv(args.train_dataset,args.target)
+        valid_dataset = MusicGenre_adv(args.valid_dataset,args.target)
+        test_dataset = MusicGenre_adv(args.test_dataset,args.target)
+        print("Loading a pretrained model ")
+        checkpoint = torch.load(os.path.join(args.checkpoint, 'sampleCNN.pth'))
+        f.load_state_dict(checkpoint)
+        del checkpoint  # reduce memory
+
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=True,
+                              num_workers=args.dataload_workers_nums, drop_last=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=args.batch_size, shuffle=True,
+                              num_workers=args.dataload_workers_nums, drop_last=True)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False,
+                             num_workers=args.dataload_workers_nums, drop_last=True)
+
     start_timestamp = int(time.time() * 1000)
     start_epoch = 0
     best_accuracy = 0
     best_loss = 1e100
     global_step = 0
 
-    if args.pre_trained:
-        print("Loading a pretrained model ")
-        # checkpoint = torch.load(os.path.join(args.checkpoint, 'speechcommand/last-speech-commands-checkpoint_adv_10_classes.pth'))
-        # f.load_state_dict(checkpoint['state_dict'])
-
-        checkpoint = torch.load(os.path.join(args.checkpoint, 'speechcommand/sampleCNN_49.pth'))
-        f.load_state_dict(checkpoint)
-        del checkpoint  # reduce memory
     def get_lr():
         return g_optimizer.param_groups[0]['lr']
 
-
+    # a name used to save checkpoints etc.
+    full_name = '%s_%s_bs%d_lr%.1e_wd%.1e' % (
+        args.model, args.optim, args.batch_size, args.g_lr, args.weight_decay)
     writer = SummaryWriter(comment=('_speech_commands_' + full_name))
-
-    print("training %s for Google speech commands..." % args.model)
     since = time.time()
     for epoch in range(start_epoch, args.max_epochs):
-        train(epoch, CLASSES2IDX[args.target])
-        epoch_loss = valid(epoch, CLASSES2IDX[args.target])
-        # if epoch % 2 == 0:
-        test(epoch, CLASSES2IDX[args.target])
+        if "wideresnet28_10" in args.model:
+            class_idx = CLASSES2INDEX[args.target]
+        elif "sampleCNN" in args.model:
+            class_idx = CLASSES2IDX[args.target]
+
+        train(epoch, class_idx)
+        epoch_loss = valid(epoch, class_idx)
+        if epoch % 2 == 0:
+            test(epoch, class_idx)
 
         time_elapsed = time.time() - since
         time_str = 'total time elapsed: {:.0f}h {:.0f}m {:.0f}s '.format(time_elapsed // 3600,

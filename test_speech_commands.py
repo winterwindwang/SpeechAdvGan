@@ -6,7 +6,8 @@ import torchnet.meter as meter
 from pytorch_mfcc import MFCC
 
 from datasets import *
-from transforms import *
+from torchvision import transforms
+import torch
 
 def test():
     f.eval() # set model to evluate mode
@@ -22,11 +23,19 @@ def test():
         # inputs = Variable(torch.unsqueeze(val, dim=1), requires_grad=True)
         # targets = Variable(label, requires_grad=False)
 
-        if use_gpu:
+
+
+        if "cuda" in device.__str__():
             inputs = inputs.cuda()
             targets = label.cuda(async=True)
         # forward
-        outputs = f(inputs)
+
+        if "wideresnet28_10" in args.model:
+            lengths = [inputs.size(2) for _ in range(inputs.size(0))]
+            val, mfcc_lengths = mfcc_layer(torch.squeeze(inputs), lengths)
+            outputs = f(torch.unsqueeze(val, dim=1))
+        elif "sampleCNN" in args.model:
+            outputs = f(inputs)
         outputs = torch.nn.functional.softmax(outputs, dim=1)
 
         # statistic
@@ -51,37 +60,43 @@ if __name__ == '__main__':
                         help='path of kaggle test dataset')
     parser.add_argument('--output', type=str, default='',
                         help='save output to file for the kaggle competition, if empty the model name will be used')
-    parser.add_argument('--model', choices=models.available_models, default=models.available_models[0],
-                        help='model of NN')
+    parser.add_argument('--model', choices=models.available_models, default=models.available_models[1],
+                        help='available_model: 1 for WideResNet trained on speech command dataset,'
+                             '0 for SampleCNN trained on music genres dataset')
     parser.add_argument('--checkpoint', type=str, default='./checkpoint', help='')
-    parser.add_argument("--dataset-dir", type=str, default='datasets/genres/test', help='path of generated data')
-    # parser.add_argument("--dataset-dir", type=str, default='datasets/speech_commands/test', help='path of test dataset')
-
+    parser.add_argument("--dataset-dir", type=str, default=r'D:\DataSource\speech_commands_v002\test', help='path of generated data')
     args = parser.parse_args()
-
 
     print('loading model...')
     f = models.create_model(model_name=args.model, num_classes=10, in_channels=1)
-    checkpoint = torch.load('checkpoints/speechcommand/sampleCNN_49.pth') # last-speech-commands-checkpoint_adv_wide50_classes
-    f.load_state_dict(checkpoint)    # sampleCNN
-    # f.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()})
-    # f.eval()
-    use_gpu = torch.cuda.is_available()
-    print('use_gpu', use_gpu)
-    if use_gpu:
-        torch.backends.cudnn.benchmark = True
-        f.cuda()
-
-    # test_dataset = SpeechCommandsDataset_classifier(dataset_dir, transform=transforms.ToTensor())
-    #
-    # test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=use_gpu,
-    #                               num_workers=args.dataload_workers_nums)
-    test_dataset = MusicGenre(args.dataset_dir)  # valid_feature_transform
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=use_gpu,
-                             num_workers=args.dataload_workers_nums)
-    pbar = tqdm(test_loader, unit='generate audio', unit_scale=test_loader.batch_size)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # mfcc_layer = MFCC(samplerate=16384, numcep=32, nfft=2048, nfilt=32).to(device)  # MFCC layer
+
+    if "cuda" in device.__str__():
+        print('use_gpu', True)
+        torch.backends.cudnn.benchmark = True
+        f = torch.nn.DataParallel(f).to(device)  # If encouter the error of "Missing key(s) in state_dict, use this code can solve the error"
+        # f.cuda()
+
+    if "wideresnet28_10" in args.model:
+        test_dataset = SpeechCommandsDataset_classifier(args.dataset_dir)
+        test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=True,
+                                  num_workers=args.dataload_workers_nums)
+        mfcc_layer = MFCC(samplerate=16384, numcep=32, nfft=2048, nfilt=32).to(device)  # MFCC layer
+
+        checkpoint = torch.load('checkpoints/wideResNet28_10.pth')
+        f.load_state_dict(checkpoint['state_dict'])
+
+    elif "sampleCNN" in args.model:
+        test_dataset = MusicGenre(args.dataset_dir)  # valid_feature_transform
+        test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, pin_memory=True,
+                                 num_workers=args.dataload_workers_nums)
+        checkpoint = torch.load(
+            'checkpoints/sampleCNN.pth')  # last-speech-commands-checkpoint_adv_wide50_classes
+        f.load_state_dict(checkpoint)  # sampleCNN
+    # f.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()})
+    f.eval()
+    pbar = tqdm(test_loader, unit='generate audio', unit_scale=test_loader.batch_size)
+
     criterion = torch.nn.CrossEntropyLoss()
     test()
 

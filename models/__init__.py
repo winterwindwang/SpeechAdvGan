@@ -8,12 +8,7 @@ from .sampleCNN import SampleCNN01
 
 available_models = [
     'sampleCNN',
-    'vgg19_bn',
-    'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152',
-    'wideresnet28_10', 'wideresnet28_10D', 'wideresnet52_10',
-    'resnext29_8_64',
-    'dpn92',
-    'densenet_bc_100_12', 'densenet_bc_250_24', 'densenet_bc_190_40',
+    'wideresnet28_10'
 ]
 
 def create_model(model_name, num_classes, in_channels):
